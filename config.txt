@@ -1,0 +1,4 @@
+G=6.6743e-11
+dt=1000
+total_time=3.16e7
+filename=results/example_sun_earth_lagrangian_points.txt
