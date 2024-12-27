@@ -12,6 +12,7 @@ public:
 
     Body(double m, std::vector<double> pos, std::vector<double> vel);
     std::vector<double> acceleration(const std::vector<Body> &bodies, double G);
+    void collision(std::vector<Body> &bodies, double collision_distance);
 };
 
 #endif

@@ -1,5 +1,6 @@
 #include "bodies.h"
 #include <vector>
+#include <cmath>
 
 Body::Body(double m, std::vector<double> pos, std::vector<double> vel)
     : position(pos), velocity(vel)
@@ -11,7 +12,7 @@ Body::Body(double m, std::vector<double> pos, std::vector<double> vel)
     mass = m;
 }
 
-std::vector<double> Body::acceleration(const std::vector<Body> &bodies, double G = 6.67430e-11)
+std::vector<double> Body::acceleration(const std::vector<Body> &bodies, double G)
 {
     std::vector<double> accel = {0.0, 0.0, 0.0};
     const double SOFTENING = 1e-8; // avoid division by zeros
@@ -34,4 +35,32 @@ std::vector<double> Body::acceleration(const std::vector<Body> &bodies, double G
         }
     }
     return accel;
+}
+
+void Body::collision(std::vector<Body> &bodies, double collision_distance)
+{
+    for (Body &body : bodies)
+    {
+        if (&body != this)
+        {
+            double dx = body.position[0] - position[0];
+            double dy = body.position[1] - position[1];
+            double dz = body.position[2] - position[2];
+            double dist = sqrt(dx * dx + dy * dy + dz * dz);
+
+            if (dist <= collision_distance)
+            {
+                for (int i = 0; i < 3; ++i)
+                {
+                    double v1 = velocity[i];
+                    double v2 = body.velocity[i];
+                    double m1 = mass;
+                    double m2 = body.mass;
+
+                    velocity[i] = ((m1 - m2) * v1 + 2 * m2 * v2) / (m1 + m2);
+                    body.velocity[i] = ((m2 - m1) * v2 + 2 * m1 * v1) / (m1 + m2);
+                }
+            }
+        }
+    }
 }
