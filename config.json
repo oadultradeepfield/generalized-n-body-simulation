@@ -1,0 +1,54 @@
+{
+  "config": {
+    "G": 6.6743e-11,
+    "dt": 1000,
+    "total_time": 3.16e7,
+    "filename": "results/example_sun_earth_lagrangian_points.txt",
+    "collision_distance": 1e-8
+  },
+  "coordinates_type": "spherical",
+  "bodies": [
+    {
+      "name": "Sun",
+      "mass": 1.989e30,
+      "position": [0.0, 0.0, 1.5707963268],
+      "velocity": [0.0, 0.0, 0.0]
+    },
+    {
+      "name": "Earth",
+      "mass": 5.972e24,
+      "position": [1.496e11, 0.0, 1.5707963268],
+      "velocity": [0.0, 2.9788e4, 0.0]
+    },
+    {
+      "name": "L1",
+      "mass": 6500,
+      "position": [1.481e11, 0.0, 1.5707963268],
+      "velocity": [0.0, 2.9489e4, 0.0]
+    },
+    {
+      "name": "L2",
+      "mass": 6500,
+      "position": [1.511e11, 0.0, 1.5707963268],
+      "velocity": [0.0, 3.0087e4, 0.0]
+    },
+    {
+      "name": "L3",
+      "mass": 6500,
+      "position": [1.496e11, 3.1415926536, 1.5707963268],
+      "velocity": [0.0, 2.978e4, 0.0]
+    },
+    {
+      "name": "L4",
+      "mass": 6500,
+      "position": [1.496e11, 1.0471975512, 1.5707963268],
+      "velocity": [0.0, 2.978e4, 0.0]
+    },
+    {
+      "name": "L5",
+      "mass": 6500,
+      "position": [1.496e11, -1.0471975512, 1.5707963268],
+      "velocity": [0.0, 2.978e4, 0.0]
+    }
+  ]
+}

@@ -3,152 +3,101 @@
 #include <fstream>
 #include <cstdlib>
 #include <chrono>
-#include <sstream>
+#include <nlohmann/json.hpp>
 #include "simulation.h"
 #include "bodies.h"
 #include "utils.h"
 #include "integration.h"
 
-void read_config(const std::string &filename, double &G, double &dt, double &total_time, std::string &output_filename, double &collision_distance)
+using json = nlohmann::json;
+
+void convert_spherical_to_cartesian(const std::vector<double> &spherical_pos,
+                                    const std::vector<double> &spherical_vel,
+                                    std::vector<double> &cartesian_pos,
+                                    std::vector<double> &cartesian_vel)
 {
-    std::ifstream file(filename);
-    if (!file)
-    {
-        std::cerr << "Could not open config file: " << filename << std::endl;
-        exit(1);
-    }
+    double r = spherical_pos[0];
+    double theta = spherical_pos[1];
+    double phi = spherical_pos[2];
 
-    std::string line;
-    while (std::getline(file, line))
-    {
-        std::stringstream ss(line);
-        std::string key;
-        std::string value;
+    double vr = spherical_vel[0];
+    double vtheta = spherical_vel[1];
+    double vphi = spherical_vel[2];
 
-        std::getline(ss, key, '=');
-        std::getline(ss, value);
+    cartesian_pos = {
+        r * std::cos(theta) * std::sin(phi),
+        r * std::sin(theta) * std::sin(phi),
+        r * std::cos(phi)};
 
-        if (key == "G")
-            G = std::stod(value);
-        else if (key == "dt")
-            dt = std::stod(value);
-        else if (key == "total_time")
-            total_time = std::stod(value);
-        else if (key == "filename")
-            output_filename = value;
-        else if (key == "collision_distance")
-            collision_distance = std::stod(value);
-    }
+    cartesian_vel = {
+        vr * std::sin(phi) * std::cos(theta) - vtheta * std::sin(theta) + vphi * std::cos(theta) * std::cos(phi),
+        vr * std::sin(phi) * std::sin(theta) + vtheta * std::cos(theta) + vphi * std::cos(theta) * std::sin(phi),
+        vr * std::cos(phi) - vphi * std::sin(phi)};
 }
 
-void read_bodies(const std::string &filename, std::vector<Body> &bodies, const std::string &coordinates)
+std::vector<Body> parse_bodies_from_json(const json &j)
 {
-    std::ifstream file(filename);
-    if (!file)
+    std::vector<Body> bodies;
+    std::string coordinates_type = j["coordinates_type"];
+
+    for (const auto &body : j["bodies"])
     {
-        std::cerr << "Could not open bodies file: " << filename << std::endl;
-        exit(1);
-    }
+        double mass = body["mass"];
+        std::vector<double> pos = body["position"];
+        std::vector<double> vel = body["velocity"];
 
-    std::string line;
-    double mass, x, y, z, vx, vy, vz;
-    double r, theta, phi, vr, vtheta, vphi;
-
-    while (std::getline(file, line))
-    {
-        if (line.empty() || line[0] == '#')
-            continue;
-
-        std::stringstream ss(line);
-        if (!(ss >> mass))
+        if (coordinates_type == "spherical")
         {
-            std::cerr << "Invalid mass value in line: " << line << std::endl;
-            continue;
-        }
-
-        if (!std::getline(file, line) || line.empty() || line[0] == '#')
-            continue;
-        std::stringstream pos_ss(line);
-
-        if (coordinates == "cartesian")
-        {
-            if (!(pos_ss >> x >> y >> z))
-            {
-                std::cerr << "Invalid position values in line: " << line << std::endl;
-                continue;
-            }
-        }
-        else if (coordinates == "spherical")
-        {
-            if (!(pos_ss >> r >> theta >> phi))
-            {
-                std::cerr << "Invalid spherical position values in line: " << line << std::endl;
-                continue;
-            }
-            x = r * std::cos(theta) * std::sin(phi);
-            y = r * std::sin(theta) * std::sin(phi);
-            z = r * std::cos(phi);
+            std::vector<double> cartesian_pos, cartesian_vel;
+            convert_spherical_to_cartesian(pos, vel, cartesian_pos, cartesian_vel);
+            bodies.push_back(Body(mass, cartesian_pos, cartesian_vel));
         }
         else
         {
-            std::cerr << "Invalid coordinate system specified: " << coordinates << std::endl;
-            continue;
+            bodies.push_back(Body(mass, pos, vel));
         }
-
-        if (!std::getline(file, line) || line.empty() || line[0] == '#')
-            continue;
-        std::stringstream vel_ss(line);
-
-        if (coordinates == "cartesian")
-        {
-            if (!(vel_ss >> vx >> vy >> vz))
-            {
-                std::cerr << "Invalid velocity values in line: " << line << std::endl;
-                continue;
-            }
-        }
-        else if (coordinates == "spherical")
-        {
-            if (!(vel_ss >> vr >> vtheta >> vphi))
-            {
-                std::cerr << "Invalid spherical velocity values in line: " << line << std::endl;
-                continue;
-            }
-            vx = vr * std::sin(phi) * std::cos(theta) - vtheta * std::sin(theta) + vphi * std::cos(theta) * std::cos(phi);
-            vy = vr * std::sin(phi) * std::sin(theta) + vtheta * std::cos(theta) + vphi * std::cos(theta) * std::sin(phi);
-            vz = vr * std::cos(phi) - vphi * std::sin(phi);
-        }
-        else
-        {
-            std::cerr << "Invalid coordinate system specified for velocity: " << coordinates << std::endl;
-            continue;
-        }
-
-        bodies.push_back(Body(mass, {x, y, z}, {vx, vy, vz}));
     }
+
+    return bodies;
 }
 
 int main(int argc, char *argv[])
 {
-    if (argc < 4)
+    if (argc < 2)
     {
-        std::cerr << "Usage: " << argv[0] << " <config_file> <bodies_file> <coordinates>" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <json_config_file>" << std::endl;
         return 1;
     }
 
-    std::string config_filename = argv[1];
-    std::string bodies_filename = argv[2];
-    std::string coordinates = argv[3];
+    std::string json_filename = argv[1];
 
-    double G, dt, total_time, collision_distance;
-    std::string output_filename;
+    std::ifstream file(json_filename);
+    if (!file)
+    {
+        std::cerr << "Could not open JSON file: " << json_filename << std::endl;
+        return 1;
+    }
 
-    read_config(config_filename, G, dt, total_time, output_filename, collision_distance);
+    json j;
+    try
+    {
+        file >> j;
+    }
+    catch (const json::parse_error &e)
+    {
+        std::cerr << "JSON parsing error: " << e.what() << std::endl;
+        return 1;
+    }
 
-    std::vector<Body> bodies;
-    read_bodies(bodies_filename, bodies, coordinates);
+    double G = j["config"]["G"];
+    double dt = j["config"]["dt"];
+    double total_time = j["config"]["total_time"];
+    std::string output_filename = j["config"]["filename"];
+    double collision_distance = j["config"]["collision_distance"];
 
-    std::cout << "Simulation started..." << std::endl;
+    std::vector<Body> bodies = parse_bodies_from_json(j);
+
+    std::cout << "Simulation started with " << bodies.size() << " bodies..." << std::endl;
 
     auto start_time = std::chrono::high_resolution_clock::now();
 

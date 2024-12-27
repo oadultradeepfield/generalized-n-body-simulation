@@ -3,15 +3,15 @@
 ![C++](https://img.shields.io/badge/c++-%2300599C.svg?style=for-the-badge&logo=c%2B%2B&logoColor=white)
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 
-This repository builds upon my [previous work on 3-Body Simulation](https://github.com/oadultradeepfield/three-body-simulation/). While the core implementation remains unchanged, this version introduces support for both spherical and Cartesian coordinate systems. Note that the angle $\theta$ is measured from the X-axis, while $\phi$ is measured from the Z-axis down to the plane orthogonal to it. Furthermore, it calculates changes in velocity resulting from momentum transfer during collisions, assuming the collisions are elastic.
+This repository builds upon my [previous work on 3-Body Simulation](https://github.com/oadultradeepfield/three-body-simulation/). While the core implementation remains unchanged, this version introduces support for both spherical and Cartesian coordinate systems in a unified configuration file. Note that the angle $\theta$ is measured from the X-axis, while $\phi$ is measured from the Z-axis down to the plane orthogonal to it. Additionally, it calculates changes in velocity resulting from momentum transfer during collisions, assuming elastic collisions.
 
 ## Installation (Same as Previous)
 
 1. Clone the repository and navigate to the project directory:
 
    ```bash
-   git clone https://github.com/oadultradeepfield/three-body-simulation.git
-   cd three-body-simulation
+   git clone https://github.com/oadultradeepfield/n-body-simulation.git
+   cd n-body-simulation
    ```
 
 2. Create a build directory, generate the Makefile with CMake, and build the project:
@@ -29,43 +29,54 @@ This repository builds upon my [previous work on 3-Body Simulation](https://gith
    pip install -r python/requirements.txt
    ```
 
-## Usage (Extra Argument to Specify Coordinate System)
+## Usage (Updated Configuration File)
 
-1. Configure the simulation by editing `config.txt` and `bodies_cartesian.txt` or `bodies_spherical.txt`:
+1. Configure the simulation by editing the new unified `config.json` file. This file includes all the necessary configuration parameters for both the simulation and the bodies, as well as the coordinate system type. Example:
 
-   - `config.txt`
+   **config.json**
 
-     ```bash
-        G=6.6743e-11
-        dt=1000
-        total_time=3.16e7
-        filename=results/example_sun_earth_lagrangian_points.txt
-     ```
+   ```json
+   {
+     "config": {
+       "G": 6.6743e-11,
+       "dt": 1000,
+       "total_time": 3.16e7,
+       "filename": "results/example_sun_earth_lagrangian_points.txt",
+       "collision_distance": 1e-8
+     },
+     "coordinates_type": "spherical",
+     "bodies": [
+       {
+         "name": "Sun",
+         "mass": 1.989e30,
+         "position": [0.0, 0.0, 1.5707963268],
+         "velocity": [0.0, 0.0, 0.0]
+       },
+       {
+         "name": "Earth",
+         "mass": 5.972e24,
+         "position": [1.496e11, 0.0, 1.5707963268],
+         "velocity": [0.0, 2.9788e4, 0.0]
+       },
+       {
+         "name": "L1",
+         "mass": 6500,
+         "position": [1.481e11, 0.0, 1.5707963268],
+         "velocity": [0.0, 2.9489e4, 0.0]
+       }
+     ]
+   }
+   ```
 
-   - `bodies_spherical.txt`
+   - `config.json` contains general simulation parameters like the gravitational constant `G`, time step `dt`, total time, output file, and collision distance.
+   - The `coordinates_type` specifies the coordinate system (`"cartesian"` or `"spherical"`).
+   - The `bodies` section lists the celestial bodies with their respective properties: `name`, `mass`, `position`, and `velocity`.
+   - If you are using Cartesian coordinates, make sure to input the coordinates as $x, y, z$. For spherical coordinates, use $r, \theta, \phi$ instead.
 
-     ```bash
-     # Sun
-     1.989e30
-     0.0 0.0 1.5707963268
-     0.0 0.0 0.0
-
-     # Earth
-     5.972e24
-     1.496e11 0.0 1.5707963268
-     0.0 2.9788e4 0.0
-
-     # L1
-     6.500e3
-     1.481e11 0.0 1.5707963268
-     0.0 2.9489e4 0.0
-     ...
-     ```
-
-2. Run the simulation (change `spherical` to `cartesian` if you wish to do so):
+2. Run the simulation, specifying the coordinate system as a parameter (either `cartesian` or `spherical`):
 
    ```bash
-   build/NBodySimulation config.txt bodies_spherical.txt spherical
+   build/NBodyOrbit config.json
    ```
 
 3. Generate trajectory plots (optional):
@@ -74,7 +85,7 @@ This repository builds upon my [previous work on 3-Body Simulation](https://gith
    python3 python/plot.py --filename ./results/example_sun_earth_lagrangian_points.txt --N 7 --labels Sun,Earth,L1,L2,L3,L4,L5
    ```
 
-The output plot will be saved in the same directory as the `.txt` file.
+   The output plot will be saved in the same directory as the `.txt` file.
 
 |                               **Example 3D Trajectory**                               |                                **Example XY Projection**                                 |
 | :-----------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------: |
