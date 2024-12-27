@@ -47,19 +47,19 @@ This repository builds upon my [previous work on 3-Body Simulation](https://gith
      "coordinates_type": "spherical",
      "bodies": [
        {
-         "name": "Sun",
+         "_name": "Sun",
          "mass": 1.989e30,
          "position": [0.0, 0.0, 1.5707963268],
          "velocity": [0.0, 0.0, 0.0]
        },
        {
-         "name": "Earth",
+         "_name": "Earth",
          "mass": 5.972e24,
          "position": [1.496e11, 0.0, 1.5707963268],
          "velocity": [0.0, 2.9788e4, 0.0]
        },
        {
-         "name": "L1",
+         "_name": "L1",
          "mass": 6500,
          "position": [1.481e11, 0.0, 1.5707963268],
          "velocity": [0.0, 2.9489e4, 0.0]
@@ -72,6 +72,7 @@ This repository builds upon my [previous work on 3-Body Simulation](https://gith
    - The `coordinates_type` specifies the coordinate system (`"cartesian"` or `"spherical"`).
    - The `bodies` section lists the celestial bodies with their respective properties: `name`, `mass`, `position`, and `velocity`.
    - If you are using Cartesian coordinates, make sure to input the coordinates as $x, y, z$. For spherical coordinates, use $r, \theta, \phi$ instead.
+   - Note that `_name` is optional; it is simply used to help guide the user when inputting multiple objects, making it easier to navigate through the configuration.
 
 2. Run the simulation, specifying the coordinate system as a parameter (either `cartesian` or `spherical`):
 

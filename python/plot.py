@@ -1,7 +1,8 @@
-import numpy as np
-import matplotlib.pyplot as plt
 import argparse
 import os
+
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 def read_data(filename, num_objects):
