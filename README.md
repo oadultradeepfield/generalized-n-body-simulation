@@ -1,6 +1,9 @@
-# Generalized N-Body Simulation
+# N-Body Orbit Simulation
 
-This repository builds upon my [previous work on 3-Body Simulation](https://github.com/oadultradeepfield/three-body-simulation/). While the core implementation remains unchanged, this version introduces support for both spherical and Cartesian coordinate systems. Note that the angle $\theta$ is measured from the X-axis, while $\phi$ is measured from the Z-axis down to the plane orthogonal to it.
+![C++](https://img.shields.io/badge/c++-%2300599C.svg?style=for-the-badge&logo=c%2B%2B&logoColor=white)
+![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
+
+This repository builds upon my [previous work on 3-Body Simulation](https://github.com/oadultradeepfield/three-body-simulation/). While the core implementation remains unchanged, this version introduces support for both spherical and Cartesian coordinate systems. Note that the angle $\theta$ is measured from the X-axis, while $\phi$ is measured from the Z-axis down to the plane orthogonal to it. Furthermore, it calculates changes in velocity resulting from momentum transfer during collisions, assuming the collisions are elastic.
 
 ## Installation (Same as Previous)
 
