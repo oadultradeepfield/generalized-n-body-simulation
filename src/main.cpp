@@ -9,7 +9,7 @@
 #include "utils.h"
 #include "integration.h"
 
-void read_config(const std::string &filename, double &G, double &dt, double &total_time, std::string &output_filename)
+void read_config(const std::string &filename, double &G, double &dt, double &total_time, std::string &output_filename, double &collision_distance)
 {
     std::ifstream file(filename);
     if (!file)
@@ -36,6 +36,8 @@ void read_config(const std::string &filename, double &G, double &dt, double &tot
             total_time = std::stod(value);
         else if (key == "filename")
             output_filename = value;
+        else if (key == "collision_distance")
+            collision_distance = std::stod(value);
     }
 }
 
@@ -138,10 +140,10 @@ int main(int argc, char *argv[])
     std::string bodies_filename = argv[2];
     std::string coordinates = argv[3];
 
-    double G, dt, total_time;
+    double G, dt, total_time, collision_distance;
     std::string output_filename;
 
-    read_config(config_filename, G, dt, total_time, output_filename);
+    read_config(config_filename, G, dt, total_time, output_filename, collision_distance);
 
     std::vector<Body> bodies;
     read_bodies(bodies_filename, bodies, coordinates);
@@ -150,7 +152,7 @@ int main(int argc, char *argv[])
 
     auto start_time = std::chrono::high_resolution_clock::now();
 
-    run_simulation(bodies, dt, total_time, output_filename, G);
+    run_simulation(bodies, dt, total_time, output_filename, G, collision_distance);
 
     auto end_time = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed_time = end_time - start_time;

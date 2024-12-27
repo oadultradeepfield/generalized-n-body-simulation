@@ -3,7 +3,7 @@
 #include <vector>
 #include <cmath>
 
-void runge_kutta_step(std::vector<Body> &bodies, double dt, double G)
+void runge_kutta_step(std::vector<Body> &bodies, double dt, double G, double collision_distance)
 {
     const size_t num_bodies = bodies.size();
 
@@ -78,5 +78,11 @@ void runge_kutta_step(std::vector<Body> &bodies, double dt, double G)
             bodies[i].position[j] += (dt / 6.0) * (k1_pos[i][j] + 2.0 * k2_pos[i][j] + 2.0 * k3_pos[i][j] + k4_pos[i][j]);
             bodies[i].velocity[j] += (dt / 6.0) * (k1_vel[i][j] + 2.0 * k2_vel[i][j] + 2.0 * k3_vel[i][j] + k4_vel[i][j]);
         }
+    }
+
+    // Handle collisions after updating positions and velocities
+    for (size_t i = 0; i < num_bodies; ++i)
+    {
+        bodies[i].collision(bodies, collision_distance);
     }
 }
