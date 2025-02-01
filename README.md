@@ -1,12 +1,9 @@
 # N-Body Orbit Simulation
 
 ![C++](https://img.shields.io/badge/c++-%2300599C.svg?style=for-the-badge&logo=c%2B%2B&logoColor=white)
-![Go](https://img.shields.io/badge/go-%2300ADD8.svg?style=for-the-badge&logo=go&logoColor=white)
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 
 This repository builds upon my [previous work on 3-Body Simulation](https://github.com/oadultradeepfield/three-body-simulation/). While the core implementation remains unchanged, this version introduces support for both spherical and Cartesian coordinate systems in a unified configuration file. Note that the angle $\theta$ is measured from the X-axis, while $\phi$ is measured from the Z-axis down to the plane orthogonal to it. Additionally, it calculates changes in velocity resulting from momentum transfer during collisions, assuming elastic collisions.
-
-In January 2025, I reimplemented the entire program in Go, being designed to input and output the same data as the C++ version. The distinct installation steps for each are labeled with (C++) or (Go) before the instructions below.
 
 ## Installation (Same as Previous)
 
@@ -17,7 +14,7 @@ In January 2025, I reimplemented the entire program in Go, being designed to inp
   cd n-body-simulation
   ```
 
-- (C++) Create a build directory, generate the Makefile with CMake, and build the project:
+- Create a build directory, generate the Makefile with CMake, and build the project:
 
   ```bash
   mkdir build
@@ -25,8 +22,6 @@ In January 2025, I reimplemented the entire program in Go, being designed to inp
   cmake ..
   make
   ```
-
-  **Note**: For Go, you can skip this step. Ensure you have Go installed on your device.
 
 - Install Python dependencies for visualization:
 
@@ -77,16 +72,10 @@ In January 2025, I reimplemented the entire program in Go, being designed to inp
   - If you are using Cartesian coordinates, make sure to input the coordinates as $x, y, z$. For spherical coordinates, use $r, \theta, \phi$ instead.
   - Note that `_name` is optional; it is simply used to help guide the user when inputting multiple objects, making it easier to navigate through the configuration.
 
-- (C++) Run the simulation, specifying the coordinate system as a parameter (either `cartesian` or `spherical`):
+- Run the simulation, specifying the coordinate system as a parameter (either `cartesian` or `spherical`):
 
   ```bash
   build/NBodyOrbit config.json
-  ```
-
-- (Go) Run the simulation, specifying the coordinate system as a parameter (either `cartesian` or `spherical`):
-
-  ```bash
-  go run go/cmd/main.go config.json
   ```
 
 - Generate trajectory plots (optional):
